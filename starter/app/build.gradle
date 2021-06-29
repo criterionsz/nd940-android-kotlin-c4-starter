@@ -16,6 +16,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        multiDexEnabled true
     }
     buildTypes {
         release {
@@ -31,12 +32,16 @@ android {
         returnDefaultValues = true
     }
 
-    //dataBinding {
-    //    enabled = true
-    //    enabledForTests = true
-    //}
+    dataBinding {
+        enabled = true
+        enabledForTests = true
+    }
     buildFeatures {
         dataBinding true
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
@@ -115,12 +120,14 @@ dependencies {
     androidTestImplementation "org.mockito:mockito-core:$mockitoVersion"
     androidTestImplementation "com.linkedin.dexmaker:dexmaker-mockito:$dexMakerVersion"
     androidTestImplementation('org.koin:koin-test:2.0.1') { exclude group: 'org.mockito' }
-
+    implementation 'com.android.support:multidex:1.0.3'
 
 
     //Maps & Geofencing
     implementation "com.google.android.gms:play-services-location:$playServicesVersion"
     implementation "com.google.android.gms:play-services-maps:$playServicesVersion"
+    implementation 'com.firebaseui:firebase-ui-auth:5.0.0'
+    implementation platform('com.google.firebase:firebase-bom:28.1.0')
 
 
 }

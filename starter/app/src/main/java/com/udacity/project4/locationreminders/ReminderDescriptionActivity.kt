@@ -32,6 +32,18 @@ class ReminderDescriptionActivity : AppCompatActivity() {
             this,
             R.layout.activity_reminder_description
         )
-//        TODO: Add the implementation of the reminder details
+        val item = intent.extras?.getSerializable(EXTRA_ReminderDataItem) as ReminderDataItem
+        binding.reminderDataItem = item
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        startActivity(
+            Intent(this, RemindersActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
+        )
+        finish()
+        return super.onSupportNavigateUp()
     }
 }
