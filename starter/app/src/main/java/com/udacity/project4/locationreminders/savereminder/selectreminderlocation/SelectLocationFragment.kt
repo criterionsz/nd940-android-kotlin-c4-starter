@@ -3,36 +3,24 @@ package com.udacity.project4.locationreminders.savereminder.selectreminderlocati
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Intent
-import android.content.IntentSender
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
-import android.provider.Settings
-import android.util.Log
 import android.view.*
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.navigation.fragment.findNavController
-import com.google.android.gms.common.api.ResolvableApiException
-import com.google.android.gms.location.*
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
-import com.google.android.material.snackbar.Snackbar
 import com.udacity.project4.R
 import com.udacity.project4.base.BaseFragment
-import com.udacity.project4.base.NavigationCommand
 import com.udacity.project4.databinding.FragmentSelectLocationBinding
-import com.udacity.project4.locationreminders.REQUEST_TURN_DEVICE_LOCATION_ON
-import com.udacity.project4.locationreminders.RemindersActivity
-import com.udacity.project4.locationreminders.TAG
 import com.udacity.project4.locationreminders.savereminder.SaveReminderViewModel
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
-import kotlinx.android.synthetic.main.activity_reminders.*
-import org.koin.android.ext.android.bind
 import org.koin.android.ext.android.inject
 import java.util.*
 
@@ -60,9 +48,9 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         setHasOptionsMenu(true)
         setDisplayHomeAsUpEnabled(true)
 
-       binding.save.setOnClickListener {
-           onLocationSelected()
-       }
+        binding.save.setOnClickListener {
+            onLocationSelected()
+        }
 
         return binding.root
     }
@@ -71,7 +59,6 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         super.onViewCreated(view, savedInstanceState)
         val mapFragment = childFragmentManager
             .findFragmentById(R.id.map) as SupportMapFragment
-        checkPermission()
         mapFragment.getMapAsync(this)
     }
 
@@ -158,16 +145,6 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
     override fun onMapReady(p0: GoogleMap) {
         map = p0
         enableMyLocation()
-
-//        val latitude = 55.754341
-//        val longitude = 37.620623
-        val zoomLevel = 15f
-        //    val square = LatLng(latitude, longitude)
-//        map.moveCamera(CameraUpdateFactory.newLatLngZoom(LatLng(
-//            map.get
-//
-//        ), zoomLevel))
-        setMapClick(map)
         setPoiClick(map)
     }
 
@@ -188,25 +165,6 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
             )
 
             binding.save.visibility = View.VISIBLE
-        }
-    }
-
-    private fun checkPermission() {
-        if ((requireActivity() as RemindersActivity).foregroundAndBackgroundLocationPermissionApproved()) {
-           // checkDeviceLocationSettingsAndStartGeofence()
-        } else {
-            Snackbar.make(
-                reminderLayout,
-                R.string.permission_denied_explanation, Snackbar.LENGTH_INDEFINITE
-            )
-                .setAction(R.string.settings) {
-                    // Displays App settings screen.
-                    startActivity(Intent().apply {
-                        action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                        data = Uri.fromParts("package", requireActivity().packageName, null)
-                        flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    })
-                }.show()
         }
     }
 
