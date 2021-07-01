@@ -85,20 +85,11 @@ class SaveReminderFragment : BaseFragment() {
                 longitude
             )
             item?.let {
-                if (_viewModel.validateAndSaveReminder(it)) {
-                    checkDeviceLocationSettingsAndStartGeofence()
-                } else {
-                    _viewModel.showToast.value = getString(R.string.geofences_not_added)
-                    return@setOnClickListener
+                if (_viewModel.validateEnteredData(it)) {
+                    addGeofenceForClue()
                 }
             }
-
-            _viewModel.navigationCommand.value =
-                NavigationCommand.To(
-                    SaveReminderFragmentDirections.actionSaveReminderFragmentToReminderListFragment()
-                )
         }
-        checkPermissionsAndStartGeofencing()
     }
 
     private fun checkDeviceLocationSettingsAndStartGeofence(resolve: Boolean = true) {
@@ -116,12 +107,13 @@ class SaveReminderFragment : BaseFragment() {
                 // Location settings are not satisfied, but this can be fixed
                 // by showing the user a dialog.
                 try {
-                    // Show the dialog by calling startResolutionForResult(),
-                    // and check the result in onActivityResult().
-                    exception.startResolutionForResult(
-                        requireActivity(),
-                        REQUEST_TURN_DEVICE_LOCATION_ON
+                    startIntentSenderForResult(
+                        exception.resolution.intentSender,
+                        REQUEST_CODE_LOCATION_SETTING, null,
+                        0, 0, 0,
+                        null
                     )
+                    REQUEST_TURN_DEVICE_LOCATION_ON     // is this needed??
                 } catch (sendEx: IntentSender.SendIntentException) {
                     Log.d(TAG, "Error geting location settings resolution: " + sendEx.message)
                 }
@@ -183,7 +175,7 @@ class SaveReminderFragment : BaseFragment() {
             // Add the new geofence request with the new geofence
             geofencingClient.addGeofences(geofencingRequest, geofencePendingIntent)?.run {
                 addOnSuccessListener {
-                    Log.d("Add Geofence", geofence.requestId)
+                    _viewModel.validateAndSaveReminder(item)
                 }
                 addOnFailureListener {
                     // Failed to add geofences.
@@ -259,8 +251,7 @@ class SaveReminderFragment : BaseFragment() {
         }
 
         Log.d(TAG, "Request foreground only location permission")
-        ActivityCompat.requestPermissions(
-            requireActivity(),
+        requestPermissions(
             permissionsArray,
             resultCode
         )
@@ -341,3 +332,5 @@ class SaveReminderFragment : BaseFragment() {
             "SaveReminderFragment.treasureHunt.action.ACTION_GEOFENCE_EVENT"
     }
 }
+
+private const val REQUEST_CODE_LOCATION_SETTING = 1

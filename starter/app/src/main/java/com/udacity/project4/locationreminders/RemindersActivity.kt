@@ -1,27 +1,11 @@
 package com.udacity.project4.locationreminders
 
-import android.Manifest
-import android.annotation.TargetApi
-import android.app.PendingIntent
-import android.content.Intent
-import android.content.IntentSender
-import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
-import android.provider.Settings
-import android.util.Log
 import android.view.MenuItem
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
 import androidx.navigation.fragment.NavHostFragment
-import com.google.android.gms.common.api.ResolvableApiException
-import com.google.android.gms.location.*
-import com.google.android.material.snackbar.Snackbar
 import com.udacity.project4.R
-import com.udacity.project4.locationreminders.geofence.GeofenceBroadcastReceiver
 import kotlinx.android.synthetic.main.activity_reminders.*
-import org.koin.android.BuildConfig
 
 /**
  * The RemindersActivity that holds the reminders fragments
@@ -43,6 +27,7 @@ class RemindersActivity : AppCompatActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
+
 
 }
 

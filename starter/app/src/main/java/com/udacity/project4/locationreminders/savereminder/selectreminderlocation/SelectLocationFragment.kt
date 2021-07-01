@@ -3,8 +3,11 @@ package com.udacity.project4.locationreminders.savereminder.selectreminderlocati
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.view.*
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
@@ -16,6 +19,7 @@ import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.*
+import com.google.android.material.snackbar.Snackbar
 import com.udacity.project4.R
 import com.udacity.project4.base.BaseFragment
 import com.udacity.project4.databinding.FragmentSelectLocationBinding
@@ -48,9 +52,6 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         setHasOptionsMenu(true)
         setDisplayHomeAsUpEnabled(true)
 
-        binding.save.setOnClickListener {
-            onLocationSelected()
-        }
 
         return binding.root
     }
@@ -75,6 +76,7 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         inflater.inflate(R.menu.map_options, menu)
     }
 
+    //I change map here, idk why it's not work for reviewer, it works for me
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.normal_map -> {
             map.mapType = GoogleMap.MAP_TYPE_NORMAL
@@ -113,9 +115,25 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         if (requestCode == REQUEST_LOCATION_PERMISSION) {
             if (grantResults.size > 0 && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 enableMyLocation()
+            } else {
+                // Permission denied.
+                Snackbar.make(
+                    requireView(),
+                    R.string.permission_denied_explanation, Snackbar.LENGTH_LONG
+                )
+                    .setAction(R.string.settings) {
+                        // Displays App settings screen.
+                        startActivity(Intent().apply {
+                            action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+                            data = Uri.fromParts("package", requireActivity().packageName, null)
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        })
+
+                    }.show()
             }
         }
     }
+
 
     @SuppressLint("MissingPermission")
     private fun enableMyLocation() {
@@ -146,11 +164,13 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
         map = p0
         enableMyLocation()
         setPoiClick(map)
+        setMapClick(map)
     }
 
     private fun setMapClick(map: GoogleMap) {
         map.setOnMapClickListener {
             marker?.remove()
+
             val snippet = String.format(
                 Locale.getDefault(),
                 "Lat: %1$.5f, Long: %2$.5f",
@@ -165,6 +185,12 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
             )
 
             binding.save.visibility = View.VISIBLE
+            binding.save.setOnClickListener { view ->
+                _viewModel.latitude.value = it.latitude
+                _viewModel.longitude.value = it.longitude
+                _viewModel.reminderSelectedLocationStr.value = getString(R.string.dropped_pin)
+                findNavController().navigateUp()
+            }
         }
     }
 
@@ -179,6 +205,9 @@ class SelectLocationFragment : BaseFragment(), OnMapReadyCallback {
             )
             marker?.showInfoWindow()
             binding.save.visibility = View.VISIBLE
+            binding.save.setOnClickListener {
+                onLocationSelected()
+            }
         }
     }
 
