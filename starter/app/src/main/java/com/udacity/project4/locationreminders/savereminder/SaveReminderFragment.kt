@@ -30,6 +30,7 @@ import com.udacity.project4.locationreminders.geofence.GeofencingConstants
 import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
 import kotlinx.android.synthetic.main.activity_reminders.*
+import kotlinx.coroutines.delay
 import org.koin.android.ext.android.inject
 
 class SaveReminderFragment : BaseFragment() {
@@ -55,7 +56,6 @@ class SaveReminderFragment : BaseFragment() {
             DataBindingUtil.inflate(inflater, R.layout.fragment_save_reminder, container, false)
 
         setDisplayHomeAsUpEnabled(true)
-
         binding.viewModel = _viewModel
         geofencingClient = LocationServices.getGeofencingClient(requireActivity())
 
@@ -86,7 +86,7 @@ class SaveReminderFragment : BaseFragment() {
             )
             item?.let {
                 if (_viewModel.validateEnteredData(it)) {
-                    addGeofenceForClue()
+                    checkPermissionsAndStartGeofencing()
                 }
             }
         }
@@ -277,8 +277,8 @@ class SaveReminderFragment : BaseFragment() {
         ) {
             // Permission denied.
             Snackbar.make(
-                reminderLayout,
-                R.string.permission_denied_explanation, Snackbar.LENGTH_INDEFINITE
+                requireView(),
+                R.string.permission_denied_explanation, Snackbar.LENGTH_SHORT
             )
                 .setAction(R.string.settings) {
                     // Displays App settings screen.
