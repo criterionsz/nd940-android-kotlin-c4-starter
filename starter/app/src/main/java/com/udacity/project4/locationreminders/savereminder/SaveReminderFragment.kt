@@ -30,7 +30,6 @@ import com.udacity.project4.locationreminders.geofence.GeofencingConstants
 import com.udacity.project4.locationreminders.reminderslist.ReminderDataItem
 import com.udacity.project4.utils.setDisplayHomeAsUpEnabled
 import kotlinx.android.synthetic.main.activity_reminders.*
-import kotlinx.coroutines.delay
 import org.koin.android.ext.android.inject
 
 class SaveReminderFragment : BaseFragment() {
@@ -109,11 +108,10 @@ class SaveReminderFragment : BaseFragment() {
                 try {
                     startIntentSenderForResult(
                         exception.resolution.intentSender,
-                        REQUEST_CODE_LOCATION_SETTING, null,
+                        REQUEST_TURN_DEVICE_LOCATION_ON, null,
                         0, 0, 0,
                         null
                     )
-                    REQUEST_TURN_DEVICE_LOCATION_ON     // is this needed??
                 } catch (sendEx: IntentSender.SendIntentException) {
                     Log.d(TAG, "Error geting location settings resolution: " + sendEx.message)
                 }
@@ -332,5 +330,3 @@ class SaveReminderFragment : BaseFragment() {
             "SaveReminderFragment.treasureHunt.action.ACTION_GEOFENCE_EVENT"
     }
 }
-
-private const val REQUEST_CODE_LOCATION_SETTING = 1
